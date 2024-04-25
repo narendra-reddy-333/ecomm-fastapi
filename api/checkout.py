@@ -1,8 +1,8 @@
 import uuid
 
 from fastapi import APIRouter, HTTPException
+
 from .models import Order, DiscountCode
-from .cart import cart  # Import the in-memory cart
 
 checkout_router = APIRouter()
 
@@ -11,10 +11,8 @@ current_order_count = 0
 available_discount = None
 
 
-# ... previous code ...
-
 @checkout_router.post("/checkout")
-async def checkout(discount_code: str = None):  # Make checkout async-ready
+def checkout(discount_code: str = None):
     global current_order_count, available_discount, cart, orders
 
     current_order_count += 1
