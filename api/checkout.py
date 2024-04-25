@@ -2,7 +2,7 @@ import uuid
 
 from fastapi import APIRouter, HTTPException
 
-from .models import Order, DiscountCode
+from .models import Order, DiscountCode, CheckoutResponse
 
 checkout_router = APIRouter()
 
@@ -38,8 +38,8 @@ def checkout(discount_code: str = None):
         available_discount.is_used = True
 
     cart.clear()  # Clear cart after successful checkout
-    return {
-        "message": "Order placed",
-        "order": order.__dict__,  # Return order details (modify if needed)
-        "discount": discount
-    }
+    return CheckoutResponse(
+        message="Order placed",
+        order=order,
+        discount=discount
+    )
