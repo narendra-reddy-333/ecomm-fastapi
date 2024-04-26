@@ -64,8 +64,8 @@ This project implements a simple e-commerce store backend API using FastAPI. It 
 
 ### Running the Application
 
-1.  **Clone the repository:** `git clone https://github.com/your-username/ecommerce_api.git`
-2.  **Install dependencies:** `pip install fastapi uvicorn`
+1.  **Clone the repository:** `git clone https://github.com/narendra-reddy-333/ecomm-fastapi.git`
+2.  **Install dependencies:** `pip install -r requirements.txt`
 3.  **Run the application:** `uvicorn main:app --reload`
 4.  **Access the API documentation:** `http://localhost:8000/docs` (use this as Postman equivalent)
 
