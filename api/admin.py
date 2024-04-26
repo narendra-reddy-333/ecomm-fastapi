@@ -1,51 +1,29 @@
-import uuid  # For code generation
+import uuid
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 
-from .models import Order, DiscountCode, GenerateDiscountResponse, AdminStatsResponse
+from .cart import order_history
+from .constants import DISCOUNT_PERCENTAGE
 
 admin_router = APIRouter()
 
-orders = []  # In-memory order history
+
+@admin_router.post("/discount")
+async def generate_discount():
+    global current_discount_code
+    current_discount_code = str(uuid.uuid4())[:8]
+    return {"code": current_discount_code}
 
 
 @admin_router.get("/stats")
-def get_stats():
-    def calculate_order_amount(order: Order) -> float:
-        """Calculates the total amount of an order, applying any discount.
-
-        Assumptions:
-        * Product prices are not stored separately; you'll need a way to retrieve them.
-        """
-
-        total_amount = sum(item.product_id * item.quantity for item in
-                           order.cart_items)  # Replace product_id with how you retrieve the price
-
-        if order.discount_code:
-            discount = 0.1 * total_amount
-            total_amount -= discount
-
-        return total_amount
-
-    total_items = sum(sum(order.cart_items, []).quantity for order in orders)
-    total_amount = sum(calculate_order_amount(order) for order in orders)  # Implement calculate_order_amount as needed
-    discounts = [code for code in orders if code.discount_code]
-    total_discount = sum(0.1 * calculate_order_amount(order) for order in discounts)
-
-    return AdminStatsResponse(  # Return the Pydantic response model
-        total_items_purchased=total_items,
-        total_purchase_amount=total_amount,
-        discount_codes=[code.code for code in discounts],
-        total_discount_amount=total_discount
-    )
-
-
-@admin_router.post("/generate-discount")  # New endpoint
-def generate_discount():
-    global available_discount
-
-    if available_discount:
-        raise HTTPException(status_code=400, detail="Discount code already exists")
-
-    available_discount = DiscountCode(code=str(uuid.uuid4())[:8])
-    return GenerateDiscountResponse(message="Discount code generated", code=available_discount.code)
+async def get_stats():
+    total_items = sum(item.quantity for order in order_history for item in order.items)
+    total_purchase_amount = sum(order.total_price for order in order_history)
+    discount_codes = [order.discount_code for order in order_history if order.discount_code]
+    total_discount_amount = sum(DISCOUNT_PERCENTAGE * order.total_price for order in order_history if order.discount_code)
+    return {
+        "total_items": total_items,
+        "total_purchase_amount": total_purchase_amount,
+        "discount_codes": discount_codes,
+        "total_discount_amount": total_discount_amount
+    }
