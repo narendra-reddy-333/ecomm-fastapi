@@ -11,7 +11,7 @@ admin_router = APIRouter()
 @admin_router.post("/discount")
 async def generate_discount():
     global current_discount_code
-    current_discount_code = str(uuid.uuid4())[:8]
+    current_discount_code = str(uuid.uuid4())[:8].upper()
     return {"code": current_discount_code}
 
 

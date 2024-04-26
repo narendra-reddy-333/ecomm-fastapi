@@ -44,7 +44,7 @@ async def checkout():
     order.total_price = calculate_total_price(order)
 
     if order_count % NTH_ORDER == 0:  # if every nth order , we give discount on cart.
-        current_discount_code = str(uuid.uuid4())[:8]
+        current_discount_code = str(uuid.uuid4())[:8].upper()
         order.discount_code = current_discount_code
 
     order_history.append(order)
